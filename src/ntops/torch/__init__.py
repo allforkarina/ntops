@@ -6,13 +6,18 @@ from ntops.torch.bitwise_and import bitwise_and
 from ntops.torch.bitwise_not import bitwise_not
 from ntops.torch.bitwise_or import bitwise_or
 from ntops.torch.bmm import bmm
+from ntops.torch.cartesian_prod import cartesian_prod
 from ntops.torch.clamp import clamp
+from ntops.torch.column_stack import column_stack
 from ntops.torch.conv2d import conv2d
 from ntops.torch.cos import cos
 from ntops.torch.div import div
 from ntops.torch.dropout import dropout
 from ntops.torch.eq import eq
 from ntops.torch.exp import exp
+from ntops.torch.feature_alpha_dropout import feature_alpha_dropout
+from ntops.torch.flip import flip
+from ntops.torch.fliplr import fliplr
 from ntops.torch.ge import ge
 from ntops.torch.gelu import gelu
 from ntops.torch.gt import gt
@@ -23,13 +28,18 @@ from ntops.torch.le import le
 from ntops.torch.lt import lt
 from ntops.torch.matmul import matmul
 from ntops.torch.max_pool2d import max_pool2d
+from ntops.torch.meshgrid import meshgrid
 from ntops.torch.mm import mm
+from ntops.torch.mode import mode
+from ntops.torch.mse_loss import mse_loss
 from ntops.torch.mul import mul
 from ntops.torch.ne import ne
 from ntops.torch.neg import neg
+from ntops.torch.pixel_unshuffle import pixel_unshuffle
 from ntops.torch.pow import pow
 from ntops.torch.relu import relu
 from ntops.torch.rms_norm import rms_norm
+from ntops.torch.roll import roll
 from ntops.torch.rotary_position_embedding import rotary_position_embedding
 from ntops.torch.rsqrt import rsqrt
 from ntops.torch.scaled_dot_product_attention import scaled_dot_product_attention
@@ -49,13 +59,18 @@ __all__ = [
     "bitwise_not",
     "bitwise_or",
     "bmm",
+    "cartesian_prod",
     "clamp",
+    "column_stack",
     "conv2d",
     "cos",
     "div",
     "dropout",
     "eq",
     "exp",
+    "feature_alpha_dropout",
+    "flip",
+    "fliplr",
     "ge",
     "gelu",
     "gt",
@@ -66,13 +81,18 @@ __all__ = [
     "lt",
     "matmul",
     "max_pool2d",
+    "meshgrid",
     "mm",
+    "mode",
+    "mse_loss",
     "mul",
     "ne",
     "neg",
+    "pixel_unshuffle",
     "pow",
     "relu",
     "rms_norm",
+    "roll",
     "rotary_position_embedding",
     "rsqrt",
     "scaled_dot_product_attention",
