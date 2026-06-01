@@ -1,3 +1,11 @@
+"""
+Roll (cyclic shift) — torch interface layer.
+
+The roll is performed by slicing the input into two segments (tail +
+head) and concatenating them in reversed order.  This produces a contiguous
+tensor that the kernel then copies into the output buffer.
+"""
+
 import torch
 
 import ntops

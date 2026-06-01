@@ -7,7 +7,8 @@ from ntops.kernels.element_wise import arrangement
 
 
 def application(src, dst):
-    dst = src  # noqa: F841
+    for i in range(src.shape[0]):
+        dst[i] = src[i]
 
 
 def premake(ndim, dtype=None, block_size=None):
