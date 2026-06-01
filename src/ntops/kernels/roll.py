@@ -2,7 +2,7 @@
 
 This is an experimental real-kernel implementation used to verify whether
 ninetoothed application code supports computed index expressions such as
-``input[row, dim_size - shift + i]`` and ``output[row, shift + i]``.
+``input[row][dim_size - shift + i]`` and ``output[row][shift + i]``.
 """
 
 import functools
@@ -18,10 +18,10 @@ def application(input, output, shift):
 
     for row in range(input.shape[0]):
         for i in range(shift):
-            output[row, i] = input[row, dim_size - shift + i]
+            output[row][i] = input[row][dim_size - shift + i]
 
         for i in range(dim_size - shift):
-            output[row, shift + i] = input[row, i]
+            output[row][shift + i] = input[row][i]
 
 
 def premake(ndim, dim, shift, dtype=None, block_size=None):
@@ -31,8 +31,8 @@ def premake(ndim, dim, shift, dtype=None, block_size=None):
     arrangement_ = functools.partial(arrangement, dim=dim, block_size=block_size)
 
     tensors = (
-        Tensor(ndim, dtype=dtype),
-        Tensor(ndim, dtype=dtype),
+        Tensor(ndim, dtype=dtype, shape_options={"constexpr": True}),
+        Tensor(ndim, dtype=dtype, shape_options={"constexpr": True}),
         Tensor(0, constexpr=True, value=shift),
     )
 
