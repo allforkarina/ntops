@@ -25,7 +25,7 @@ def roll(input: torch.Tensor, shifts: int, dims: int = 0) -> torch.Tensor:
 
     out = torch.empty_like(input)
 
-    kernel = _cached_make(ntops.kernels.roll.premake, input.ndim, dim, shift)
+    kernel = _cached_make(ntops.kernels.roll.premake, input.ndim, dim, shift, N)
     kernel(input, out, shift)
 
     return out
