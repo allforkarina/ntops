@@ -1,10 +1,4 @@
-"""
-Roll (cyclic shift) — torch interface layer.
-
-The roll is performed by slicing the input into two segments (tail +
-head) and concatenating them in reversed order.  This produces a contiguous
-tensor that the kernel then copies into the output buffer.
-"""
+"""Roll (cyclic shift) — torch interface layer."""
 
 import torch
 
@@ -25,20 +19,13 @@ def roll(input: torch.Tensor, shifts: int, dims: int = 0) -> torch.Tensor:
     Returns:
         the rolled tensor.
     """
-    N = input.shape[dims]
+    dim = dims if dims >= 0 else input.ndim + dims
+    N = input.shape[dim]
     shift = shifts % N
 
-    src = torch.cat(
-        [
-            input.narrow(dims, N - shift, shift),
-            input.narrow(dims, 0, N - shift),
-        ],
-        dim=dims,
-    )
+    out = torch.empty_like(input)
 
-    out = torch.empty_like(src)
-
-    kernel = _cached_make(ntops.kernels.roll.premake, src.ndim)
-    kernel(src, out)
+    kernel = _cached_make(ntops.kernels.roll.premake, input.ndim, dim, shift)
+    kernel(input, out, shift)
 
     return out

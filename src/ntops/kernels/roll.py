@@ -1,26 +1,8 @@
-"""
-Roll (cyclic shift) kernel.
+"""Roll (cyclic shift) kernel.
 
-The cyclic shift itself is performed in the torch layer (``torch/roll.py``)
-via ``torch.cat`` + ``torch.narrow``, which produces a contiguous rolled tensor.
-This kernel performs the final GPU-side copy into the output buffer.
-
-Once ninetoothed supports computed index expressions, the roll can be moved
-into the application::
-
-    def application(input, output, dim_size, shift):
-        for j in range(input.shape[0]):
-            # copy tail → output head
-            for i in range(shift):
-                output[j, i] = input[j, dim_size - shift + i]
-            # copy head → output tail
-            for i in range(dim_size - shift):
-                output[j, shift + i] = input[j, i]
-
-This would require ``input[j, expr]`` and ``output[j, expr]`` where *expr*
-is a loop-variable-plus-constant expression.  When that is available,
-switch the premake to use ``roll_arrangement.arrangement`` instead of
-``element_wise.arrangement``.
+This is an experimental real-kernel implementation used to verify whether
+ninetoothed application code supports computed index expressions such as
+``input[row, dim_size - shift + i]`` and ``output[row, shift + i]``.
 """
 
 import functools
@@ -28,23 +10,30 @@ import functools
 import ninetoothed
 from ninetoothed import Tensor
 
-from ntops.kernels.element_wise import arrangement
+from ntops.kernels.roll_arrangement import arrangement
 
 
-def application(src, dst):
-    for i in range(src.shape[0]):
-        dst[i] = src[i]
+def application(input, output, shift):
+    dim_size = input.shape[1]
+
+    for row in range(input.shape[0]):
+        for i in range(shift):
+            output[row, i] = input[row, dim_size - shift + i]
+
+        for i in range(dim_size - shift):
+            output[row, shift + i] = input[row, i]
 
 
-def premake(ndim, dtype=None, block_size=None):
+def premake(ndim, dim, shift, dtype=None, block_size=None):
     if block_size is None:
         block_size = ninetoothed.block_size()
 
-    arrangement_ = functools.partial(arrangement, block_size=block_size)
+    arrangement_ = functools.partial(arrangement, dim=dim, block_size=block_size)
 
     tensors = (
         Tensor(ndim, dtype=dtype),
         Tensor(ndim, dtype=dtype),
+        Tensor(0, constexpr=True, value=shift),
     )
 
     return arrangement_, application, tensors

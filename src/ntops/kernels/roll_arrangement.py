@@ -22,19 +22,15 @@ Design rationale:
   dimension without any cross-block communication.
 
 Limitation:
-  The current ninetoothed application DSL does **not** support computed index
-  expressions such as ``input[j, shift + i]``.  Until that capability is added,
-  this arrangement is paired with a plain copy application and the actual
-  cyclic shift is performed in the torch layer (see ``ntops/torch/roll.py``).
-  Once ninetoothed gains offset-index support, replace the application with
-  the two-pass copy logic described in the module docstring of
-  ``ntops/kernels/roll.py``.
+  The roll kernel uses this arrangement to verify whether ninetoothed supports
+  computed index expressions such as ``input[j, shift + i]`` inside the
+  application function.
 """
 
 import ninetoothed
 
 
-def arrangement(input, output, dim, block_size=None):
+def arrangement(input, output, shift, dim, block_size=None):
     """
     Arrange input and output tensors for a roll (cyclic shift) along *dim*.
 
@@ -67,6 +63,9 @@ def arrangement(input, output, dim, block_size=None):
     if len(non_roll_dims) > 1:
         input_arranged = input_arranged.flatten(end_dim=len(non_roll_dims) - 1)
         output_arranged = output_arranged.flatten(end_dim=len(non_roll_dims) - 1)
+    elif len(non_roll_dims) == 0:
+        input_arranged = input_arranged[None, :]
+        output_arranged = output_arranged[None, :]
 
     # Shape is now  (total_non_roll, dim_size)
 
@@ -74,4 +73,4 @@ def arrangement(input, output, dim, block_size=None):
     input_arranged = input_arranged.tile((block_size, -1))
     output_arranged = output_arranged.tile((block_size, -1))
 
-    return input_arranged, output_arranged
+    return input_arranged, output_arranged, shift
