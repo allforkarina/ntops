@@ -11,15 +11,14 @@ def arrangement(input, output, shift, roll_dim, block_size=None):
     input_arranged = input.permute(perm_order)
     output_arranged = output.permute(perm_order)
 
-    if len(non_roll_dims) > 1:
-        input_arranged = input_arranged.flatten(end_dim=len(non_roll_dims) - 1)
-        output_arranged = output_arranged.flatten(end_dim=len(non_roll_dims) - 1)
-    elif len(non_roll_dims) == 0:
-        input_arranged = input_arranged[None, :]
-        output_arranged = output_arranged[None, :]
+    block_shape = tuple(1 for _ in non_roll_dims) + (-1,)
 
-    return (
-        input_arranged.tile((block_size, -1)),
-        output_arranged.tile((block_size, -1)),
-        shift,
-    )
+    input_arranged = input_arranged.tile(block_shape)
+    output_arranged = output_arranged.tile(block_shape)
+
+    if non_roll_dims:
+        non_roll_indices = tuple(range(len(non_roll_dims)))
+        input_arranged.dtype = input_arranged.dtype.squeeze(non_roll_indices)
+        output_arranged.dtype = output_arranged.dtype.squeeze(non_roll_indices)
+
+    return input_arranged, output_arranged, shift

@@ -30,6 +30,7 @@ def test_roll_arrangement_passes_shift_to_application_only():
     )
     assert "if shift" not in source
     assert "shift," in source
+    assert ".flatten(" not in source
 
 
 def test_roll_kernel_uses_computed_source_index():
@@ -38,7 +39,8 @@ def test_roll_kernel_uses_computed_source_index():
     )
 
     assert "src = (i + dim_size - shift) % dim_size" in source
-    assert "output[row, i] = input[row, src]" in source
+    assert "output[i] = input[src]" in source
+    assert "for row in range" not in source
     assert "output[row][i]" not in source
 
 
