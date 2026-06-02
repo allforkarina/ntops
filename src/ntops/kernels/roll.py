@@ -13,7 +13,7 @@ def application(input, output, shift):
     for row in range(input.shape[0]):
         for i in range(dim_size):
             src = (i + dim_size - shift) % dim_size
-            output[row][i] = input[row][src]
+            output[row, i] = input[row, src]
 
 
 def premake(ndim, dim, shift, dim_size, dtype=None, block_size=None):

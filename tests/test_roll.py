@@ -38,7 +38,8 @@ def test_roll_kernel_uses_computed_source_index():
     )
 
     assert "src = (i + dim_size - shift) % dim_size" in source
-    assert "output[row][i] = input[row][src]" in source
+    assert "output[row, i] = input[row, src]" in source
+    assert "output[row][i]" not in source
 
 
 @skip_if_cuda_not_available
