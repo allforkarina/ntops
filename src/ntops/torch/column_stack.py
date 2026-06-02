@@ -8,7 +8,7 @@ from ntops.torch.utils import _cached_make
 
 def _normalize_tensor(tensor: torch.Tensor) -> torch.Tensor:
     if tensor.ndim == 0:
-        return tensor.reshape(1, 1)
+        return tensor.view([1, 1])
     if tensor.ndim == 1:
         return tensor.unsqueeze(1)
     return tensor
@@ -61,12 +61,7 @@ def _output_shape(tensors: Sequence[torch.Tensor]) -> tuple[int, ...]:
 
 
 def _column_slice(output: torch.Tensor, offset: int, width: int) -> torch.Tensor:
-    index = (
-        slice(None),
-        slice(offset, offset + width),
-        *((slice(None),) * (output.ndim - 2)),
-    )
-    return output[index]
+    return output.narrow(1, offset, width)
 
 
 def column_stack(tensors: Sequence[torch.Tensor]) -> torch.Tensor:
