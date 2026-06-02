@@ -8,7 +8,7 @@ from ntops.torch.utils import _cached_make
 
 def _normalize_tensor(tensor: torch.Tensor) -> torch.Tensor:
     if tensor.ndim == 0:
-        return tensor.view([1, 1])
+        return tensor.unsqueeze(0).unsqueeze(1)
     if tensor.ndim == 1:
         return tensor.unsqueeze(1)
     return tensor
