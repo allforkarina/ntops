@@ -2,7 +2,6 @@
 
 import functools
 
-import ninetoothed
 from ninetoothed import Tensor
 
 from ntops.kernels.roll_arrangement import arrangement
