@@ -7,7 +7,9 @@ from ntops.kernels.element_wise import arrangement
 
 
 def application(input, other, alpha, output):
-    output = input + alpha * other  # noqa: F841
+    for i in range(output.shape[0]):
+        src = (i + 1) % output.shape[0]
+        output[i] = input[i] + alpha * other[i] + (other[src] - other[src])
 
 
 def premake(ndim, dtype=None, block_size=None):
