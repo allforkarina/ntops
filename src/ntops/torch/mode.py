@@ -39,6 +39,7 @@ def mode(input: torch.Tensor, dim: int = -1, keepdim: bool = False):
         ntops.kernels.mode.premake,
         input.ndim,
         dim,
+        input.shape[dim],
         dtype=input.dtype,
     )
     kernel(input, values, indices)

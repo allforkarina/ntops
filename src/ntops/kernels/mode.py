@@ -33,16 +33,18 @@ def application(input, values, indices):
     indices = best_index  # noqa: F841
 
 
-def premake(ndim, dim, dtype=None, block_size=None):
+def premake(ndim, dim, dim_size, dtype=None, block_size=None):
     if block_size is None:
         block_size = -1
 
     arrangement_ = functools.partial(arrangement, dim=dim, block_size=block_size)
 
-    tensors = (
-        Tensor(ndim, dtype=dtype),
-        Tensor(ndim - 1, dtype=dtype),
-        Tensor(ndim - 1, dtype=ninetoothed.int64),
-    )
+    input = Tensor(ndim, dtype=dtype)
+    values = Tensor(ndim - 1, dtype=dtype)
+    indices = Tensor(ndim - 1, dtype=ninetoothed.int64)
+
+    input.shape = input.shape[:dim] + (dim_size,) + input.shape[dim + 1:]
+
+    tensors = (input, values, indices)
 
     return arrangement_, application, tensors
