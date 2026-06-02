@@ -20,7 +20,9 @@ def premake(ndim, dim, shift, dim_size, dtype=None, block_size=None):
     if block_size is None:
         block_size = 1
 
-    arrangement_ = functools.partial(arrangement, dim=dim, block_size=block_size)
+    arrangement_ = functools.partial(
+        arrangement, roll_dim=dim, block_size=block_size
+    )
 
     input = Tensor(ndim, dtype=dtype)
     output = Tensor(ndim, dtype=dtype)

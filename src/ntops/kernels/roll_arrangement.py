@@ -1,12 +1,12 @@
 """Arrangement for cyclic shift (roll) operations."""
 
 
-def arrangement(input, output, dim, block_size=None):
+def arrangement(input, output, shift, roll_dim, block_size=None):
     if block_size is None:
         block_size = 1
 
-    non_roll_dims = tuple(i for i in range(input.ndim) if i != dim)
-    perm_order = non_roll_dims + (dim,)
+    non_roll_dims = tuple(i for i in range(input.ndim) if i != roll_dim)
+    perm_order = non_roll_dims + (roll_dim,)
 
     input_arranged = input.permute(perm_order)
     output_arranged = output.permute(perm_order)
@@ -21,4 +21,5 @@ def arrangement(input, output, dim, block_size=None):
     return (
         input_arranged.tile((block_size, -1)),
         output_arranged.tile((block_size, -1)),
+        shift,
     )

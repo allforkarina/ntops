@@ -20,14 +20,16 @@ def test_roll_torch_layer_does_not_wrap_with_torch_ops():
     assert "torch.roll" not in source
 
 
-def test_roll_arrangement_keeps_shift_in_application_only():
+def test_roll_arrangement_passes_shift_to_application_only():
     source = (
         _PROJECT_ROOT / "src" / "ntops" / "kernels" / "roll_arrangement.py"
     ).read_text(encoding="utf-8")
 
-    assert "def arrangement(input, output, dim, block_size=None):" in source
-    assert "def arrangement(input, output, shift" not in source
-    assert "), shift" not in source
+    assert (
+        "def arrangement(input, output, shift, roll_dim, block_size=None):" in source
+    )
+    assert "if shift" not in source
+    assert "shift," in source
 
 
 def test_roll_kernel_uses_computed_source_index():
