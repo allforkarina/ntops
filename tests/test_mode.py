@@ -36,8 +36,8 @@ def test_mode_kernel_contains_real_frequency_scan():
 
     assert "candidate_count" in source
     assert "best_count" in source
-    assert "input[j] == candidate" in source
-    assert "values = best_value" in source
+    assert "elem == candidate" in source
+    assert "ntl.cast(best_value, input.dtype)" in source
     assert "indices = best_index" in source
 
 

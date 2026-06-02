@@ -8,16 +8,17 @@ from ntops.kernels.mode_arrangement import arrangement
 
 
 def application(input, values, indices):
-    best_value = input[0]
+    best_value = ntl.cast(input[0], ntl.float32)
     best_index = ntl.cast(0, ntl.int64)
     best_count = ntl.cast(0, ntl.int64)
 
     for i in range(input.shape[0]):
-        candidate = input[i]
+        candidate = ntl.cast(input[i], ntl.float32)
         candidate_count = ntl.cast(0, ntl.int64)
 
         for j in range(input.shape[0]):
-            matched = ntl.where(input[j] == candidate, 1, 0)
+            elem = ntl.cast(input[j], ntl.float32)
+            matched = ntl.where(elem == candidate, 1, 0)
             candidate_count += ntl.cast(matched, ntl.int64)
 
         has_more_count = candidate_count > best_count
@@ -29,7 +30,7 @@ def application(input, values, indices):
         best_index = ntl.where(should_update, ntl.cast(i, ntl.int64), best_index)
         best_count = ntl.where(should_update, candidate_count, best_count)
 
-    values = best_value  # noqa: F841
+    values = ntl.cast(best_value, input.dtype)  # noqa: F841
     indices = best_index  # noqa: F841
 
 
