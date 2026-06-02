@@ -3,7 +3,15 @@ import functools
 import ninetoothed
 from ninetoothed import Tensor
 
-from ntops.kernels.element_wise import arrangement
+
+def arrangement(src, dst, block_size=None):
+    if block_size is None:
+        block_size = ninetoothed.block_size()
+
+    src_arranged = src.flatten().tile((block_size,))
+    dst_arranged = dst.flatten().tile((block_size,))
+
+    return src_arranged, dst_arranged
 
 
 def application(src, dst):
@@ -11,15 +19,12 @@ def application(src, dst):
         dst[i] = src[i]
 
 
-def premake(ndim, dtype=None, block_size=None):
-    if block_size is None:
-        block_size = ninetoothed.block_size()
-
+def premake(ndim, input_dtype=None, output_dtype=None, block_size=None):
     arrangement_ = functools.partial(arrangement, block_size=block_size)
 
     tensors = (
-        Tensor(ndim, dtype=dtype),
-        Tensor(ndim, dtype=dtype),
+        Tensor(ndim, dtype=input_dtype),
+        Tensor(ndim, dtype=output_dtype),
     )
 
     return arrangement_, application, tensors
