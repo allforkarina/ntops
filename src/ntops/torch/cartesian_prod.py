@@ -61,7 +61,7 @@ def cartesian_prod(*tensors: torch.Tensor):
             stride,
             dtype=dtype,
         )
-        kernel(tensors[i], col)
+        kernel(tensors[i], col, stride, s_i)
 
         stride *= s_i
 
