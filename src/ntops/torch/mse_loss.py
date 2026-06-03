@@ -43,4 +43,4 @@ def mse_loss(
         return squared_error
     if reduction == "sum":
         return torch.sum(squared_error)
-    return torch.sum(squared_error) / squared_error.numel()
+    return torch.sum(squared_error) * (1.0 / squared_error.numel())
