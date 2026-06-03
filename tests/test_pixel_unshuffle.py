@@ -24,8 +24,8 @@ def test_pixel_unshuffle_kernel_has_index_mapping():
         _PROJECT_ROOT / "src" / "ntops" / "kernels" / "pixel_unshuffle.py"
     ).read_text(encoding="utf-8")
 
-    assert "h * r + i" in source
-    assert "w * r + j" in source
+    assert "h * rf + i" in source
+    assert "w * rf + j" in source
     assert "c_out // r_sq" in source
 
 
