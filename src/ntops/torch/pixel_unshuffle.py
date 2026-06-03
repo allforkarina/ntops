@@ -7,7 +7,8 @@ from ntops.torch.utils import _cached_make
 def pixel_unshuffle(input: torch.Tensor, downscale_factor: int) -> torch.Tensor:
     r"""Reverse of pixel shuffle — spatial-to-depth.
 
-    Reshapes ``(N, C, H, W)`` → ``(N, C·r², H/r, W/r)``.
+    Reshapes ``(N, C, H, W)`` → ``(N, C·r², H/r, W/r)`` where
+    *r* = ``downscale_factor``.
 
     Args:
         input:            4D tensor ``(N, C, H, W)``.
@@ -16,10 +17,42 @@ def pixel_unshuffle(input: torch.Tensor, downscale_factor: int) -> torch.Tensor:
     Returns:
         the unshuffled tensor.
     """
-    result = torch.nn.functional.pixel_unshuffle(input, downscale_factor)
+    r = downscale_factor
+    if r <= 0:
+        raise ValueError(
+            f"pixel_unshuffle: downscale_factor must be positive, got {r}"
+        )
+    if input.ndim != 4:
+        raise RuntimeError(
+            f"pixel_unshuffle: expected 4D input, got {input.ndim}D"
+        )
 
-    out = torch.empty_like(result)
-    kernel = _cached_make(ntops.kernels.pixel_unshuffle.premake, result.ndim)
-    kernel(result, out)
+    N, C, H, W = input.shape
+    if H % r != 0 or W % r != 0:
+        raise RuntimeError(
+            f"pixel_unshuffle: spatial dimensions ({H}, {W}) "
+            f"must be divisible by downscale_factor ({r})"
+        )
 
-    return out
+    C_out = C * r * r
+    H_out = H // r
+    W_out = W // r
+
+    output = torch.empty(
+        (N, C_out, H_out, W_out),
+        dtype=input.dtype,
+        device=input.device,
+    )
+
+    kernel = _cached_make(
+        ntops.kernels.pixel_unshuffle.premake,
+        N,
+        C,
+        H,
+        W,
+        r,
+        dtype=input.dtype,
+    )
+    kernel(input, output, r)
+
+    return output

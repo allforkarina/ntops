@@ -3,17 +3,54 @@ import functools
 import ninetoothed
 from ninetoothed import Tensor
 
-from ntops.kernels.element_wise import arrangement
 
-
-def application(src, dst):
-    for i in range(src.shape[0]):
-        dst[i] = src[i]
-
-
-def premake(ndim, dtype=None, block_size=None):
+def arrangement(input, output, r, block_size=None):
     if block_size is None:
         block_size = ninetoothed.block_size()
+
+    input = input.tile((-1, -1, -1, block_size * r))
+    output = output.tile((-1, -1, -1, block_size))
+
+    return input, output, r
+
+
+def application(input, output, r):
+    r_sq = r * r
+
+    for n in range(output.shape[0]):
+        for c_out in range(output.shape[1]):
+            c = c_out // r_sq
+            ij = c_out % r_sq
+            i = ij // r
+            j = ij % r
+
+            for h in range(output.shape[2]):
+                for w in range(output.shape[3]):
+                    output[n, c_out, h, w] = (
+                        input[n, c, h * r + i, w * r + j]
+                    )
+
+
+def premake(N, C, H, W, downscale_factor, dtype=None, block_size=None):
+    if block_size is None:
+        block_size = ninetoothed.block_size()
+
+    r = downscale_factor
+    C_out = C * r * r
+    H_out = H // r
+    W_out = W // r
+
     arrangement_ = functools.partial(arrangement, block_size=block_size)
-    tensors = (Tensor(ndim, dtype=dtype), Tensor(ndim, dtype=dtype))
+
+    input = Tensor(4, dtype=dtype)
+    output = Tensor(4, dtype=dtype)
+    input.shape = (N, C, H, W)
+    output.shape = (N, C_out, H_out, W_out)
+
+    tensors = (
+        input,
+        output,
+        Tensor(0, dtype=ninetoothed.int64, constexpr=True, value=r),
+    )
+
     return arrangement_, application, tensors
