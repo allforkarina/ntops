@@ -15,19 +15,20 @@ def arrangement(input, output, r, downscale_factor, block_size=None):
 
 
 def application(input, output, r):
-    r_sq = r * r
+    rf = r
+    r_sq = rf * rf
 
     for n in range(output.shape[0]):
         for c_out in range(output.shape[1]):
             c = c_out // r_sq
             ij = c_out % r_sq
-            i = ij // r
-            j = ij % r
+            i = ij // rf
+            j = ij % rf
 
             for h in range(output.shape[2]):
                 for w in range(output.shape[3]):
                     output[n, c_out, h, w] = (
-                        input[n, c, h * r + i, w * r + j]
+                        input[n, c, h * rf + i, w * rf + j]
                     )
 
 
