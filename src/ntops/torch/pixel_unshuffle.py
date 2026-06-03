@@ -44,8 +44,6 @@ def pixel_unshuffle(input: torch.Tensor, downscale_factor: int) -> torch.Tensor:
         device=input.device,
     )
 
-    block_size = 1 if W_out <= 2 else min(W_out, 8)
-
     kernel = _cached_make(
         ntops.kernels.pixel_unshuffle.premake,
         N,
@@ -54,7 +52,6 @@ def pixel_unshuffle(input: torch.Tensor, downscale_factor: int) -> torch.Tensor:
         W,
         r,
         dtype=input.dtype,
-        block_size=block_size,
     )
     kernel(input, output, r)
 
