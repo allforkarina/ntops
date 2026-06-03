@@ -36,7 +36,7 @@ def test_mse_loss_matches_torch(shape, reduction, dtype, rtol, atol):
     target = torch.randn(shape, device="cuda", dtype=dtype)
 
     nout = ntops.torch.mse_loss(pred, target, reduction)
-    rout = torch.nn.functional.mse_loss(pred, target, reduction)
+    rout = torch.nn.functional.mse_loss(pred, target, reduction=reduction)
 
     assert nout.shape == rout.shape
     assert nout.dtype == rout.dtype
