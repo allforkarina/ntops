@@ -34,7 +34,7 @@ def application(input, output, r):
 
 def premake(N, C, H, W, downscale_factor, dtype=None, block_size=None):
     if block_size is None:
-        block_size = ninetoothed.block_size()
+        block_size = 1
 
     r = downscale_factor
     C_out = C * r * r
