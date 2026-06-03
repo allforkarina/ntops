@@ -11,7 +11,7 @@ def arrangement(input_1d, output_nd, target_axis, block_size=None):
     ndim = output_nd.ndim
     perm = (target_axis,) + tuple(i for i in range(ndim) if i != target_axis)
 
-    output_permuted = output_nd.permute(*perm)
+    output_permuted = output_nd.permute(perm)
     output_flat = output_permuted.flatten(1)
     output_tiled = output_flat.tile((-1, block_size))
 
