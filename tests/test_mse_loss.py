@@ -22,6 +22,7 @@ def test_mse_loss_torch_layer_not_fake():
 
 @skip_if_cuda_not_available
 @pytest.mark.parametrize("shape", [(16,), (4, 8), (2, 3, 5), (3, 2, 4, 3)])
+@pytest.mark.parametrize("reduction", ["none", "sum", "mean"])
 @pytest.mark.parametrize(
     "dtype, rtol, atol",
     [
@@ -30,17 +31,16 @@ def test_mse_loss_torch_layer_not_fake():
         (torch.float32, 1e-4, 1e-4),
     ],
 )
-def test_mse_loss_matches_torch(shape, dtype, rtol, atol):
+def test_mse_loss_matches_torch(shape, reduction, dtype, rtol, atol):
     pred = torch.randn(shape, device="cuda", dtype=dtype)
     target = torch.randn(shape, device="cuda", dtype=dtype)
 
-    for reduction in ("none", "sum", "mean"):
-        nout = ntops.torch.mse_loss(pred, target, reduction)
-        rout = torch.nn.functional.mse_loss(pred, target, reduction)
+    nout = ntops.torch.mse_loss(pred, target, reduction)
+    rout = torch.nn.functional.mse_loss(pred, target, reduction)
 
-        assert nout.shape == rout.shape
-        assert nout.dtype == rout.dtype
-        assert torch.allclose(nout, rout, rtol=rtol, atol=atol)
+    assert nout.shape == rout.shape
+    assert nout.dtype == rout.dtype
+    assert torch.allclose(nout, rout, rtol=rtol, atol=atol)
 
 
 @skip_if_cuda_not_available
