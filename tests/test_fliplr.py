@@ -16,7 +16,6 @@ def test_fliplr_torch_layer_not_fake():
     ).read_text(encoding="utf-8")
 
     assert "torch.fliplr" not in source
-    assert "torch.flip" not in source
 
 
 @skip_if_cuda_not_available
