@@ -31,16 +31,16 @@ def mse_loss(
             "mse_loss expects input and target to have the same shape"
         )
 
+    scale = 1.0 / pred.numel() if reduction == "mean" else 1.0
+
     squared_error = torch.empty_like(pred)
     kernel = _cached_make(
         ntops.kernels.mse_loss.premake,
         pred.ndim,
         dtype=pred.dtype,
     )
-    kernel(pred, target, squared_error)
+    kernel(pred, target, scale, squared_error)
 
     if reduction == "none":
         return squared_error
-    if reduction == "sum":
-        return torch.sum(squared_error)
-    return torch.sum(squared_error) * (1.0 / squared_error.numel())
+    return torch.sum(squared_error)

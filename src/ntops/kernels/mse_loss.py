@@ -6,10 +6,9 @@ from ninetoothed import Tensor
 from ntops.kernels.element_wise import arrangement
 
 
-def application(pred, target, output):
-    """逐元素均方误差：(pred - target)²。"""
+def application(pred, target, scale, output):
     diff = pred - target
-    output = diff * diff  # noqa: F841
+    output = diff * diff * scale  # noqa: F841
 
 
 def premake(ndim, dtype=None, block_size=None):
@@ -21,6 +20,7 @@ def premake(ndim, dtype=None, block_size=None):
     tensors = (
         Tensor(ndim, dtype=dtype),
         Tensor(ndim, dtype=dtype),
+        Tensor(0, dtype=ninetoothed.float64),
         Tensor(ndim, dtype=dtype),
     )
 
