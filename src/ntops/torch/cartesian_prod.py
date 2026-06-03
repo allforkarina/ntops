@@ -47,7 +47,7 @@ def cartesian_prod(*tensors: torch.Tensor):
 
     M = math.prod(sizes)
 
-    output = torch.empty(M, n, dtype=dtype, device=device)
+    output = torch.empty((M, n), dtype=dtype, device=device)
 
     stride = 1
     for i in range(n - 1, -1, -1):
