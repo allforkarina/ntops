@@ -4,7 +4,11 @@ import ntops
 from ntops.torch.utils import _cached_make
 
 
-def mse_loss(pred: torch.Tensor, target: torch.Tensor, reduction: str = "mean") -> torch.Tensor:
+def mse_loss(
+    pred: torch.Tensor,
+    target: torch.Tensor,
+    reduction: str = "mean",
+) -> torch.Tensor:
     r"""Mean squared error loss.
 
     .. math::
@@ -12,20 +16,31 @@ def mse_loss(pred: torch.Tensor, target: torch.Tensor, reduction: str = "mean") 
 
     Args:
         pred:      predicted tensor.
-        target:    ground-truth tensor.
-        reduction: ``'mean'``, ``'sum'``, or ``'none'``.
+        target:    ground-truth tensor (same shape as ``pred``).
+        reduction: ``'none'``, ``'sum'``, or ``'mean'``.
 
     Returns:
         the loss tensor.
     """
-    # Step 1: kernel 计算逐元素平方误差（真正的 GPU 计算）
+    if reduction not in ("none", "sum", "mean"):
+        raise ValueError(
+            f"{reduction} is not a valid value for reduction"
+        )
+    if pred.shape != target.shape:
+        raise RuntimeError(
+            "mse_loss expects input and target to have the same shape"
+        )
+
     squared_error = torch.empty_like(pred)
-    kernel = _cached_make(ntops.kernels.mse_loss.premake, pred.ndim)
+    kernel = _cached_make(
+        ntops.kernels.mse_loss.premake,
+        pred.ndim,
+        dtype=pred.dtype,
+    )
     kernel(pred, target, squared_error)
 
-    # Step 2: reduction
     if reduction == "none":
         return squared_error
     if reduction == "sum":
-        return squared_error.sum()
-    return squared_error.mean()
+        return torch.sum(squared_error)
+    return torch.sum(squared_error) / squared_error.numel()
