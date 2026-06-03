@@ -4,11 +4,11 @@ import ninetoothed
 from ninetoothed import Tensor
 
 
-def arrangement(input, output, r, block_size=None):
+def arrangement(input, output, r, downscale_factor, block_size=None):
     if block_size is None:
         block_size = ninetoothed.block_size()
 
-    input = input.tile((-1, -1, -1, block_size * r))
+    input = input.tile((-1, -1, -1, block_size * downscale_factor))
     output = output.tile((-1, -1, -1, block_size))
 
     return input, output, r
@@ -40,7 +40,11 @@ def premake(N, C, H, W, downscale_factor, dtype=None, block_size=None):
     H_out = H // r
     W_out = W // r
 
-    arrangement_ = functools.partial(arrangement, block_size=block_size)
+    arrangement_ = functools.partial(
+        arrangement,
+        downscale_factor=downscale_factor,
+        block_size=block_size,
+    )
 
     input = Tensor(4, dtype=dtype)
     output = Tensor(4, dtype=dtype)
