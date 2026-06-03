@@ -33,6 +33,8 @@ def premake(ndim, target_axis, dim_size, dtype=None, block_size=None):
     )
 
     input = Tensor(1, dtype=dtype)
+    input.shape = (dim_size,)
+
     output = Tensor(ndim, dtype=dtype)
     output.shape = (
         output.shape[:target_axis]
